@@ -27,10 +27,10 @@ io.on('connection', function(socket){
 
   socket.on('newUser', user => {
     users.push(user)
-    io.emit('usersUpdated', users)
+    io.emit('usersUpdated', users.length)
   })
 
-  socket.on('chat message', ({id: userId, message: msg}) => {
+  socket.on('chat message', ({id: userId, name, message: msg}) => {
 
     if(msg.includes('|')){
       const msgArray = msg.split('|');
@@ -44,22 +44,48 @@ io.on('connection', function(socket){
         targetedUsers.push(usersArray[index].trim());
       }
 
-      for(const u of targetedUsers){
-        let [{id}] = users.filter(user => user.name === u)
-        socketIds.push(id)
+        for(const u of targetedUsers){  
+        const matchedUsers = users.filter(user => user.name === u)
+        if(matchedUsers[0]){
+          let {id} = matchedUsers[0] 
+          socketIds.push(id)
+        }
+        
       }
 
       socketIds.push(userId)
 
-      for(const targetId of socketIds){
-        console.log(`Mandando mensagem privada para: ${targetId}`)
-        io.to(targetId).emit('chat message', msg)
+      if(socketIds.length > 1){
+        for(const targetId of socketIds){
+          console.log(`Mandando mensagem privada para: ${targetId}`)
+          io.to(targetId).emit('chat message', msg)
+        }
       }
 
-      
+      else{
+        io.to(socketIds[0]).emit('userNotFound', `Usuário não encontrado.`);
+      }
+
     }
+    
     else io.emit('chat message', msg);
   });
+
+  socket.on('disconnect', () => {
+    /*
+    console.log('Usuários: ')
+    console.log(users)
+    console.log(`Usuário desconectado: ${socket.id}`)
+    */
+    const user = users.find(u => u.id === socket.id)
+    if(user){
+      users.splice(users.indexOf(user), 1)
+    }
+    /*
+    console.log('Usuários logados: ')
+    console.log(users)
+    */
+  })
     
 });
 

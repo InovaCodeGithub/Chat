@@ -16,5 +16,13 @@
     "start": "node server.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/InovaCodeGithub/chat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/InovaCodeGithub/chat/issues"
+  },
+  "homepage": "https://github.com/InovaCodeGithub/chat#readme"
 }

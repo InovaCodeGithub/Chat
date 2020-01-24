@@ -1,6 +1,3 @@
-<link rel="stylesheet" href="/src/app/views/chat.css">
-
-
 <style media="screen">
     body {width: 500px; margin: 0 auto; margin-top: 2rem; }
     .send {width: 100%; margin: 0; padding: 0; margin-top: 1rem; }
@@ -10,11 +7,17 @@
     ul {list-style-type: none;width: 100%;padding: 0;margin: 0;}
     li { padding: 5px 10px; }
     li:nth-child(odd) {background-color: #eee}
+    .iln{
+        display: inline-block;
+    }
+    .iln + .iln{
+        margin-left: 5px;;
+    }
 </style>
 
 
 <!--  Lista de mensagens -->
- 
+<h2 class='iln' >Online : </h2><h2 class="iln" id="onlineUsers"></h2>
 <ul class="ul" id="messages"></ul>
  
     <!--  input com e botão de submit-->
@@ -63,7 +66,7 @@
     
     socket.on('connect', () => {
             socket.emit('newUser', {name: nome_usuario, id: socket.id})
-            socket.emit('chat message', {id: socket.id, message: `Bem Vindo ${nome_usuario}!`})
+            socket.emit('chat message', {id: socket.id, name: nome_usuario, message: `Bem Vindo ${nome_usuario}!`})
     })
     
     // adiciona um addEventListener para o botão de submit
@@ -76,7 +79,7 @@
       if (msg.length > 0) {
           console.log(msg);
           // concatena o nome de usuário e a mensagem para enviar ao socketIo
-          socket.emit('chat message', {id: socket.id, message: `${nome_usuario} : ${msg}`});
+          socket.emit('chat message', {id: socket.id, name: nome_usuario,message: `${nome_usuario} : ${msg}`});
           // reseta o valor do input da mensagem
           document.getElementById('menssagem').value = "";
       }
@@ -93,5 +96,13 @@
         li.appendChild(document.createTextNode(msg));
         // adicionar o nome do usuário quebra a linha e adicionar a mensagem à lista de mensagems
         ul.appendChild(li);
-    });
-    </script>
+    })
+
+    socket.on('userNotFound', function(msg){
+        alert(msg);
+    })
+
+    socket.on('usersUpdated', function(length){
+        document.getElementById('onlineUsers').textContent = length;
+    })
+</script>
